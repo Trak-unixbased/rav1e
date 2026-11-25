@@ -87,6 +87,11 @@ clap = { version = "4.5", optional = true, default-features = false, features = 
   "std",
   "wrap_help",
   "derive",
+  # Without these clap prints an empty "Usage:" line, a reduced help and
+  # errors that do not name the offending argument.
+  "help",
+  "usage",
+  "error-context",
 ] }
 clap_complete = { version = "4.5", optional = true }
 libc = "0.2"
@@ -210,6 +215,18 @@ lto = "off"
 
 [profile.release-strip]
 inherits = "release"
+strip = "symbols"
+
+# Distribution profile used by tools/build-deb.sh (e.g. Orange Pi 6 Plus,
+# CIX CD8180, aarch64). `release` keeps `incremental = true`, which raises
+# codegen units to 256 and limits cross-unit inlining: fine while developing,
+# but a packaged binary should not inherit it.
+[profile.release-deb]
+inherits = "release"
+incremental = false
+codegen-units = 1
+lto = "fat"
+debug = false
 strip = "symbols"
 
 [profile.bench]
